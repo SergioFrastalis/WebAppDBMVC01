@@ -15,6 +15,7 @@ namespace WebAppDBMVC01
             //AddDbContext is scoped - per request a new instance is created
             builder.Services.AddDbContext<Mvc01DbContext>(options => options.UseSqlServer(connString));
             builder.Services.AddRepositories();
+            
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
