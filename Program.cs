@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using WebAppDBMVC01.Configuration;
 using WebAppDBMVC01.Data;
 using WebAppDBMVC01.Repositories;
+using WebAppDBMVC01.Services;
 
 namespace WebAppDBMVC01
 {
@@ -15,10 +18,27 @@ namespace WebAppDBMVC01
             //AddDbContext is scoped - per request a new instance is created
             builder.Services.AddDbContext<Mvc01DbContext>(options => options.UseSqlServer(connString));
             builder.Services.AddRepositories();
-            
+            builder.Host.UseSerilog((context, config) =>
+            {
+                config
+                    .ReadFrom.Configuration(context.Configuration)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console();
+            });
+            builder.Services.AddAutoMapper(typeof(MapperConfig));
+            builder.Services.AddScoped<IApplicationService, ApplicationService>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddAuthentication("CookieAuthenticationDerfaults.AuthenticationScheme")
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/User/Login";
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                    options.LogoutPath = "/Account/Logout";
+                    options.AccessDeniedPath = "/Account/AccessDenied";
+                });
 
             var app = builder.Build();
 
@@ -39,7 +59,7 @@ namespace WebAppDBMVC01
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=User}/{action=Login}/{id?}");
 
             app.Run();
         }
