@@ -6,7 +6,8 @@ SQL Server database integration
 Basic CRUD operations
 MVC architecture
 
-Technologies Used
+Technologies Used:
+
 ASP.NET Core MVC
 Entity Framework Core
 SQL Server
